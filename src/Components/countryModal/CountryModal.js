@@ -4,11 +4,13 @@ import './CountryModal.css'; // Importeer je aangepaste CSS
 
 function CountryModal({ show, handleClose, countryData }) {
     return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>{countryData ? countryData.name.common : "Loading..."}</Modal.Title>
+        <Modal show={show} onHide={handleClose} className="custom-modal">
+            <Modal.Header closeButton className="custom-modal-content">
+                <Modal.Title className="custom-modal-title">
+                    {countryData ? countryData.name.common : 'Loading...'}
+                </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="custom-modal-body">
                 {/* Conditioneel renderen van de rest van je modal inhoud */}
                 {countryData ? (
                     <>
@@ -20,13 +22,10 @@ function CountryModal({ show, handleClose, countryData }) {
                 ) : (
                     <p>Loading data...</p>
                 )}
-            </Modal.Body>
-
-            <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-            </Modal.Footer>
+            </Modal.Body>
         </Modal>
     );
 }

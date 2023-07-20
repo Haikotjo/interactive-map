@@ -1,18 +1,20 @@
-.modal-content {
-    background: rgba(0,0,0,0.4); /* Een transparante zwarte achtergrond */
-    border: 1px solid #0f0; /* Een felle groene rand */
-    box-shadow: 0 0 10px #0f0; /* Een groene gloed rond de modal */
-    color: #0f0; /* Groene tekst */
+/* CountryModal.css */
+
+.custom-modal-content {
+    background-color: rgba(43, 61, 65, 0.8);
+    border: 2px solid #00FFC5; /* Aangepaste randstijl */
 }
 
-.modal-header, .modal-footer {
-    border: none; /* Geen randen in de header/footer */
+.custom-modal-title {
+    color: #00FFC5; /* Aangepaste tekstkleur */
 }
 
-.modal-title {
-    text-shadow: 0 0 5px #0f0; /* Groene gloed rond de titeltekst */
+.custom-modal-body {
+    color: #00FFC5; /* Aangepaste tekstkleur */
+    background-color: #4C5F6B;
+    border: 2px solid #00FFC5; /* Aangepaste randstijl */
 }
 
-.modal-body {
-    background: rgba(0,0,0,0.2); /* Iets lichtere achtergrond in de body voor contrast */
+.custom-modal-footer {
+    background-color: #4C5F6B;
 }

@@ -1,10 +1,9 @@
-import WorldMap from "../../Components/worldMap/WorldMap";
 import React from 'react';
+import MapSwitcher from "../../Components/mapSwitcher/MapSwitcher";
 function HomePage() {
     return (
         <div>
-            <h1>Home Page</h1>
-            <WorldMap />
+            <MapSwitcher />
         </div>
     );
 }
