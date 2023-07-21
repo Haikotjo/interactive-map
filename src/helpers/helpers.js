@@ -28,10 +28,24 @@ export const createZoom = (svg, g) => {
             x = Math.min((width / height) * (k - 1), Math.max(width * (1 - k), x));
             y = Math.min(0, Math.max(height * (1 - k), y));
             g.attr('transform', `translate(${x},${y}) scale(${k})`);
+
+            // Bereken de zoomfactor als een percentage van de beginwaarde
+            const zoomPercentage = (k / 1.4) * 100;
+
+            // Toon de zoom factor in het HTML element
+            const zoomFactorElement = document.getElementById('zoom-factor');
+            zoomFactorElement.innerText = `Zoom: ${zoomPercentage.toFixed(2)}%`;
+            zoomFactorElement.style.display = 'block';
+
+            // Verberg het HTML element na een seconde
+            setTimeout(() => {
+                zoomFactorElement.style.display = 'none';
+            }, 2000);
         });
 
     svg.call(zoom);
 }
+
 
 // Deze functie voegt een event listener toe voor het aanpassen van de grootte van de kaart wanneer de grootte van het venster verandert
 export const resizeListener = (svg, rect, projection, countries, path, g) => {
@@ -59,14 +73,18 @@ export const createCountryPaths = (countries, colorScale, fetchCountryData, proj
                 fetchCountryData(d.properties.name);
             })
             .on('mouseover', function(event, d) {
-                d3.select(this)
-                    .attr('fill', d => d3.rgb(colorScale(d.properties.name)).brighter(0.5)) // De vulling van de landen bij mouseover kan hier worden aangepast
-                    .attr('stroke', d => colorScale(d.properties.name)); // De lijnkleur van de landen bij mouseover kan hier worden aangepast
+                const element = d3.select(this);
+                element
+                    .attr('data-original-stroke', element.attr('stroke')) // Sla de oorspronkelijke stroke kleur op
+                    .attr('data-original-fill', element.attr('fill')) // Sla de oorspronkelijke fill kleur op
+                    .attr('fill', '#27190c') // Verander de vulling van de landen bij mouseover naar een specifieke kleur, in dit geval rood
+                    .attr('stroke', '#ff0000'); // Verander de lijnkleur van de landen bij mouseover naar een specifieke kleur, in dit geval rood
             })
             .on('mouseout', function(event, d) {
-                d3.select(this)
+                const element = d3.select(this);
+                element
                     .attr('fill', d => colorScale(d.properties.name)) // De vulling van de landen bij mouseout kan hier worden aangepast
-                    .attr('stroke', '#333'); // De lijnkleur van de landen bij mouseout kan hier worden aangepast
+                    .attr('stroke', element.attr('data-original-stroke')); // Herstel de oorspronkelijke kleur
             });
     };
 };

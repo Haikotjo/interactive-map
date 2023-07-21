@@ -61,6 +61,7 @@ function WorldMap() {
         <>
             {/* We renderen het SVG-element en de modal */}
             <svg ref={ref} style={{ width: '100%', height: 'auto' }} />
+            <div id="zoom-factor" style={{display: 'none'}}></div>
             <CountryModal show={show} handleClose={handleClose} countryData={countryData} isLoading={isLoading} />
         </>
     );
