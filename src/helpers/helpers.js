@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import axios from 'axios';
 
 // Deze functie haalt data op van een gegeven URL
 export const fetchData = async (url) => {
@@ -48,7 +49,7 @@ export const createCountryPaths = (countries, colorScale, fetchCountryData, proj
     return (selection) => {
         const path = d3.geoPath(projection);
         selection
-            .data(countries.features)
+            .data(countries.features.filter(feature => feature.properties.name !== 'Antarctica')) // filter out Antarctica
             .join('path')
             .attr('d', path)
             .attr('fill', d => colorScale(d.properties.name)) // De vulling van de landen kan hier worden aangepast
@@ -76,18 +77,57 @@ export const createColorScale = (colors) => {
 };
 
 // Deze functie haalt gegevens op voor een bepaald land en zet de modal status op "show"
+
 export const fetchCountryData = (setCountryData, setIsLoading, handleShow) => async (countryName) => {
     setIsLoading(true);
     try {
-        const data = await fetchData(`https://restcountries.com/v3.1/name/${countryName}`);
-        setCountryData(data[0]);
+        // Haal landgegevens op van Rest Countries API
+        const countryData = await fetchData(`https://restcountries.com/v3.1/name/${countryName}`);
+        setCountryData(countryData[0]);
+        console.log(countryData);
+
+        // Haal de ISO 3166-1 alpha-2 code op van het countryData object
+        const countryCode = countryData[0].cca2.toLowerCase(); // 2-letter ISO 3166-1 code van het land
+        console.log(`Country Code for ${countryName}: ${countryCode}`);
+
+        // Haal nieuwsartikelen op met de juiste landcode van de News API
+        const newsArticles = await getHeadlines(countryCode);
+
+        // Hier kun je de nieuwsartikelen opslaan in een aparte state-variabele in plaats van setCountryData te gebruiken, als je dat wilt.
+        setCountryData((prevData) => ({
+            ...prevData,
+            newsArticles: newsArticles,
+        }));
+        console.log('Fetching country data for country:', countryName); // Log de waarde van countryName
         setIsLoading(false);
         handleShow();
     } catch (error) {
-        console.error('Fout bij het laden van de landgegevens:', error);
+        console.error('Fout bij het laden van de landgegevens of nieuwsartikelen:', error);
         setIsLoading(false);
     }
 };
+
+export async function getHeadlines(country) {
+    console.log(`Fetching headlines for country: ${country}`);
+
+    try {
+        const response = await axios.get('https://newsapi.org/v2/top-headlines', {
+            params: {
+                country: country,
+                pageSize: 2,
+                apiKey: process.env.REACT_APP_NEWS_API_KEY // Zorg ervoor dat dit de juiste naam van de omgevingsvariabele is
+            }
+        });
+        console.log('API Request:', response.config.url); // Log het volledige verzoek URL
+        console.log('API Params:', response.config.params); // Log de meegegeven parameters
+        return response.data.articles;
+    } catch (error) {
+        console.error('Er ging iets mis bij het ophalen van de nieuwsartikelen:', error);
+        return [];
+    }
+}
+
+
 
 // Deze functie maakt een SVG en een g-groep (algemene container voor andere SVG-elementen)
 export const createSVGAndG = (ref) => {
@@ -104,28 +144,3 @@ export const createRect = (g, width, height, fillColor) => {
         .style('fill', fillColor); // De vulling van de rechthoek kan hier worden aangepast
 };
 
-// Deze functie voegt zoom-functionaliteit toe aan de globe
-export const createGlobeZoom = (svg, projection, path, g) => {
-    const zoom = d3.zoom()
-        .scaleExtent([1, 30])
-        .on('zoom', (event) => {
-            const { transform } = event;
-            g.attr('transform', transform);
-            g.attr('stroke-width', 0.5 / transform.k); // Pas ook de lijndikte aan op basis van de zoomschaal
-        });
-
-    svg.call(zoom);
-};
-
-
-// Deze functie voegt slepen-functionaliteit toe aan de globe
-export const createGlobeDrag = (projection, path, g) => {
-    const drag = d3.drag()
-        .on('drag', function (event) {
-            const rotate = projection.rotate();
-            projection.rotate([rotate[0] + event.dx / 4, rotate[1] - event.dy / 4]);
-            g.selectAll('path').attr('d', path);
-        });
-
-    g.call(drag);
-}

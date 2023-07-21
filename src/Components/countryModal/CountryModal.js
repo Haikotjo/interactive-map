@@ -18,6 +18,18 @@ function CountryModal({ show, handleClose, countryData }) {
                         <p>Regio: {countryData.region ? countryData.region : 'Niet beschikbaar'}</p>
                         <p>Bevolking: {countryData.population ? countryData.population : 'Niet beschikbaar'}</p>
                         {/* etc. */}
+                        <h2>Nieuwsartikelen:</h2>
+                        {countryData.newsArticles && countryData.newsArticles.length > 0 ? (
+                            countryData.newsArticles.map((article, index) => (
+                                <div key={index}>
+                                    <h3>{article.title}</h3>
+                                    <p>{article.description}</p>
+                                    <a href={article.url}>Lees meer</a>
+                                </div>
+                            ))
+                        ) : (
+                            <p>Geen nieuwsartikelen beschikbaar.</p>
+                        )}
                     </>
                 ) : (
                     <p>Loading data...</p>
